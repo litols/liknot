@@ -1,0 +1,24 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: liknot
+build:
+  artifacts:
+    - image: demo-app
+      custom:
+        buildCommand: "./gradlew :demo:demo-app:bootBuildImage"
+        dependencies:
+          paths:
+            - demo/demo-app/src/**
+    - image: controller
+      custom:
+        buildCommand: "./gradlew :controller:bootBuildImage"
+        dependencies:
+          paths:
+            - controller/src/**
+  tagPolicy:
+    sha256: { }
+manifests:
+  rawYaml:
+    - demo/manifests/*
+    - controller/manifests/*
