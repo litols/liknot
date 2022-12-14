@@ -3,12 +3,16 @@ package com.leafgraph.liknot.configuration
 import io.kubernetes.client.informer.SharedIndexInformer
 import io.kubernetes.client.informer.SharedInformerFactory
 import io.kubernetes.client.openapi.ApiClient
-import io.kubernetes.client.openapi.models.V1Endpoints
-import io.kubernetes.client.openapi.models.V1EndpointsList
+import io.kubernetes.client.openapi.models.V1EndpointSlice
+import io.kubernetes.client.openapi.models.V1EndpointSliceList
+import io.kubernetes.client.openapi.models.V1Ingress
+import io.kubernetes.client.openapi.models.V1IngressList
 import io.kubernetes.client.openapi.models.V1Node
 import io.kubernetes.client.openapi.models.V1NodeList
 import io.kubernetes.client.openapi.models.V1Pod
 import io.kubernetes.client.openapi.models.V1PodList
+import io.kubernetes.client.openapi.models.V1Service
+import io.kubernetes.client.openapi.models.V1ServiceList
 import io.kubernetes.client.util.generic.GenericKubernetesApi
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,21 +21,41 @@ import org.springframework.context.annotation.Configuration
 class SharedIndexInformerConfiguration {
 
     @Bean
-    fun endpointsInformer(
+    fun endpointSliceInformer(
         apiClient: ApiClient,
         sharedInformerFactory: SharedInformerFactory
-    ): SharedIndexInformer<V1Endpoints> {
+    ): SharedIndexInformer<V1EndpointSlice> {
         val genericApi = GenericKubernetesApi(
-            V1Endpoints::class.java,
-            V1EndpointsList::class.java,
-            "",
+            V1EndpointSlice::class.java,
+            V1EndpointSliceList::class.java,
+            "discovery.k8s.io",
             "v1",
-            "endpoints",
+            "endpointslices",
             apiClient
         )
         return sharedInformerFactory.sharedIndexInformerFor(
             genericApi,
-            V1Endpoints::class.java,
+            V1EndpointSlice::class.java,
+            0
+        )
+    }
+
+    @Bean
+    fun serviceInformer(
+        apiClient: ApiClient,
+        sharedInformerFactory: SharedInformerFactory
+    ): SharedIndexInformer<V1Service> {
+        val genericApi = GenericKubernetesApi(
+            V1Service::class.java,
+            V1ServiceList::class.java,
+            "",
+            "v1",
+            "services",
+            apiClient
+        )
+        return sharedInformerFactory.sharedIndexInformerFor(
+            genericApi,
+            V1Service::class.java,
             0
         )
     }
@@ -72,6 +96,26 @@ class SharedIndexInformerConfiguration {
         return sharedInformerFactory.sharedIndexInformerFor(
             genericApi,
             V1Pod::class.java,
+            0
+        )
+    }
+
+    @Bean
+    fun ingressInformer(
+        apiClient: ApiClient,
+        sharedInformerFactory: SharedInformerFactory
+    ): SharedIndexInformer<V1Ingress> {
+        val genericApi = GenericKubernetesApi(
+            V1Ingress::class.java,
+            V1IngressList::class.java,
+            "networking.k8s.io",
+            "v1",
+            "ingresses",
+            apiClient
+        )
+        return sharedInformerFactory.sharedIndexInformerFor(
+            genericApi,
+            V1Ingress::class.java,
             0
         )
     }

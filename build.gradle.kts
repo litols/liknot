@@ -26,9 +26,15 @@ subprojects {
     }
 
     dependencyManagement {
+        imports {
+            mavenBom("com.linecorp.armeria:armeria-bom:1.20.3")
+        }
         dependencies {
             dependency("io.kubernetes:client-java-spring-integration:17.0.0")
-            dependency("io.envoyproxy.controlplane:java-control-plane:0.1.35")
+            dependencySet("io.envoyproxy.controlplane:0.1.35") {
+                entry("java-control-plane")
+                entry("server")
+            }
 
             dependency("com.willowtreeapps.assertk:assertk-jvm:0.25")
             dependency("io.github.microutils:kotlin-logging-jvm:3.0.2")

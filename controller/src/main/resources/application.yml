@@ -1,0 +1,4 @@
+armeria:
+  ports:
+    - port: 10081
+      protocol: HTTP
