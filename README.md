@@ -16,6 +16,8 @@ skaffold dev
 
 ### Result
 
+(You need to port-forward to the envoy in daemonset pod)
+
 ```shell
 ~ | on kind-liknot
  ❯❯ curl -v localhost:8080/bar -H 'Host: foo.bar.com'
