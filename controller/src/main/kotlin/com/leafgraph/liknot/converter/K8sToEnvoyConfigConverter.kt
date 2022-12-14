@@ -31,19 +31,21 @@ object K8sToEnvoyConfigConverter {
             Cluster.newBuilder()
                 .setName(getClusterNameFromK8sService(name))
                 .setLbPolicy(Cluster.LbPolicy.ROUND_ROBIN)
-                .setType(Cluster.DiscoveryType.STATIC)
+                .setType(Cluster.DiscoveryType.EDS)
                 .setEdsClusterConfig(
                     Cluster.EdsClusterConfig.newBuilder()
                         .setEdsConfig(configSource)
-                ).build()
+                        .build()
+                )
+                .build()
         }
     }
 
     fun convertToClusterLoadAssignment(endpointSlice: V1EndpointSlice): ClusterLoadAssignment {
         val localityLbEndpointBuilder = LocalityLbEndpoints.newBuilder()
-        endpointSlice.endpoints.asSequence()
-            .filter { it.conditions?.ready == true && it.conditions?.serving == true }
-            .forEach { endpoint ->
+        endpointSlice.endpoints?.asSequence()
+            ?.filter { it.conditions?.ready == true && it.conditions?.serving == true }
+            ?.forEach { endpoint ->
                 endpoint.addresses.forEach { address ->
                     localityLbEndpointBuilder.addLbEndpoints(
                         LbEndpoint.newBuilder()

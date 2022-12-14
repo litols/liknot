@@ -19,18 +19,23 @@ class XdsConfiguration {
     ): ArmeriaServerConfigurator {
         return ArmeriaServerConfigurator { builder ->
             builder.serviceUnder("/docs", DocService())
+            builder.maxRequestLength(Int.MAX_VALUE.toLong()) // なんでも受け入れていただく
+            builder.requestTimeoutMillis(0)
             builder.service(
                 GrpcService.builder()
                     .addServices(
                         v3DiscoveryServer.clusterDiscoveryServiceImpl,
                         v3DiscoveryServer.listenerDiscoveryServiceImpl,
                         v3DiscoveryServer.routeDiscoveryServiceImpl,
-                        v3DiscoveryServer.endpointDiscoveryServiceImpl
+                        v3DiscoveryServer.endpointDiscoveryServiceImpl,
+                        v3DiscoveryServer.aggregatedDiscoveryServiceImpl
                     )
                     .enableUnframedRequests(true)
                     .supportedSerializationFormats(
                         GrpcSerializationFormats.JSON,
-                        GrpcSerializationFormats.PROTO
+                        GrpcSerializationFormats.PROTO,
+                        GrpcSerializationFormats.PROTO_WEB,
+                        GrpcSerializationFormats.PROTO_WEB_TEXT
                     )
                     .build()
             )

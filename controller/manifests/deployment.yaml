@@ -70,13 +70,27 @@ subjects:
     namespace: liknot-controller
 
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: liknot-controller
+  namespace: liknot-controller
+spec:
+  type: ClusterIP
+  selector:
+    app: liknot-controller
+  ports:
+    - port: 10081
+      targetPort: 10081
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: liknot-controller
   namespace: liknot-controller
   labels:
-    app: demo
+    app: liknot-controller
 spec:
   replicas: 1
   selector:

@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: envoy
+  name: envoy
+  namespace: liknot-controller
+spec:
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+  selector:
+    matchLabels:
+      app: envoy
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9902"
+        prometheus.io/path: "/stats/prometheus"
+      labels:
+        app: envoy
+    spec:
+      containers:
+        - args:
+            - -c
+            - /config/envoy-bootstrap.yaml
+            - --service-cluster $(K8S_NAMESPACE)
+            - --service-node $(K8S_POD_NAME)
+            - --log-level info
+          command:
+            - envoy
+          image: docker.io/envoyproxy/envoy:v1.24.1
+          imagePullPolicy: IfNotPresent
+          name: envoy
+          env:
+            - name: K8S_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 8080
+              hostPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 8443
+              hostPort: 443
+              name: https
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 9901
+            initialDelaySeconds: 3
+            periodSeconds: 4
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: envoy-config
+      restartPolicy: Always
