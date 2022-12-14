@@ -20,7 +20,7 @@ class XdsConfiguration {
         return ArmeriaServerConfigurator { builder ->
             builder.serviceUnder("/docs", DocService())
             builder.maxRequestLength(Int.MAX_VALUE.toLong()) // なんでも受け入れていただく
-            builder.requestTimeoutMillis(0)
+            builder.requestTimeoutMillis(200000)
             builder.service(
                 GrpcService.builder()
                     .addServices(

@@ -34,6 +34,7 @@ object K8sToEnvoyConfigConverter {
                 .setType(Cluster.DiscoveryType.EDS)
                 .setEdsClusterConfig(
                     Cluster.EdsClusterConfig.newBuilder()
+                        .setServiceName(getClusterNameFromK8sService(name))
                         .setEdsConfig(configSource)
                         .build()
                 )
@@ -43,6 +44,7 @@ object K8sToEnvoyConfigConverter {
 
     fun convertToClusterLoadAssignment(endpointSlice: V1EndpointSlice): ClusterLoadAssignment {
         val localityLbEndpointBuilder = LocalityLbEndpoints.newBuilder()
+
         endpointSlice.endpoints?.asSequence()
             ?.filter { it.conditions?.ready == true && it.conditions?.serving == true }
             ?.forEach { endpoint ->
@@ -50,14 +52,15 @@ object K8sToEnvoyConfigConverter {
                     localityLbEndpointBuilder.addLbEndpoints(
                         LbEndpoint.newBuilder()
                             .setEndpoint(
-                                Endpoint.newBuilder().setAddress(
-                                    Address.newBuilder().setSocketAddress(
-                                        SocketAddress.newBuilder()
-                                            .setAddress(address)
-                                            .setPortValue(endpointSlice.ports?.get(0)?.port!!)
-                                            .setProtocol(SocketAddress.Protocol.TCP)
+                                Endpoint.newBuilder()
+                                    .setAddress(
+                                        Address.newBuilder().setSocketAddress(
+                                            SocketAddress.newBuilder()
+                                                .setAddress(address)
+                                                .setPortValue(endpointSlice.ports?.get(0)?.port!!)
+                                                .setProtocol(SocketAddress.Protocol.TCP)
+                                        )
                                     )
-                                )
                             )
                     )
                 }
@@ -79,6 +82,7 @@ object K8sToEnvoyConfigConverter {
             .addAllVirtualHosts(
                 aggregatedIngressRule.asSequence().map { (host, ingressRules) ->
                     VirtualHost.newBuilder()
+                        .setName(host)
                         .addDomains(host)
                         .addAllRoutes(
                             ingressRules.map { ingressRule ->

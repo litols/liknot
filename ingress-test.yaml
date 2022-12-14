@@ -14,7 +14,7 @@ spec:
               service:
                 name: demo-service
                 port:
-                  number: 80
+                  number: 8080
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -34,5 +34,5 @@ spec:
   selector:
     app: demo
   ports:
-    - port: 80
-      targetPort: 80
+    - port: 8080
+      targetPort: 8080
