@@ -11,6 +11,7 @@ Experimental-implementation K8s Ingress Controller with :
 ### How to try on your computer
 
 ```shell
+kind create cluster --config cluster.yaml
 skaffold dev
 ```
 
