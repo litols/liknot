@@ -84,6 +84,14 @@ spec:
       targetPort: 10081
 
 ---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: liknot-controller
+spec:
+  controller: leafgraph.com/liknot-controller
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

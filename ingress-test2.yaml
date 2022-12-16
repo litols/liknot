@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-foo-bar
+spec:
+  ingressClassName: liknot
+  rules:
+    - host: "foo.bar.com"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/hello"
+            backend:
+              service:
+                name: demo-service
+                port:
+                  number: 8080
+          - pathType: Prefix
+            path: "/foo" # <-- 追加！
+            backend:
+              service:
+                name: demo-service
+                port:
+                  number: 8080
