@@ -79,6 +79,13 @@ spec:
               port: 9901
             initialDelaySeconds: 3
             periodSeconds: 4
+          startupProbe:
+            httpGet:
+              path: /ready
+              port: 9901
+            initialDelaySeconds: 3
+            failureThreshold: 10
+            periodSeconds: 4
           volumeMounts:
             - name: envoy-config
               mountPath: /config
